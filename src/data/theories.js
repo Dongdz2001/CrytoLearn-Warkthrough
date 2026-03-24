@@ -1,168 +1,262 @@
 const theories = {
   caesar: {
-    title: 'Caesar Cipher',
-    history: `Caesar Cipher là một trong những kỹ thuật mã hóa đơn giản và lâu đời nhất. Nó được đặt theo tên Julius Caesar, người đã sử dụng phương pháp này để liên lạc bí mật với các tướng lĩnh.`,
-    howItWorks: `Mỗi ký tự trong bản rõ (plaintext) được dịch chuyển một số vị trí cố định trong bảng chữ cái.
+    title: 'Báo cáo Phân tích: Hệ mật Caesar (Caesar Cipher)',
+    history: `### 1. Giới thiệu & Bối cảnh lịch sử
+Hệ mật Caesar (Caesar Cipher) là một trong những kỹ thuật mã hóa thay thế đơn giản nhất và được biết đến rộng rãi nhất trong lịch sử mật mã học. Được đặt theo tên của **Julius Caesar**, vị hoàng đế La Mã đã sử dụng phương pháp này để bảo mật các thông điệp quân sự chiến lược từ hơn 2,000 năm trước. 
 
-**Ví dụ với shift = 3:**
-- A → D, B → E, C → F, ...
-- "HELLO" → "KHOOR"
+Mặc dù có cấu trúc sơ khai, Caesar Cipher đặt nền móng cho các hệ mật mã thay thế đơn biểu (monoalphabetic substitution) phát triển sau này.
 
-**Công thức:**
-- Mã hóa: E(x) = (x + n) mod 26
-- Giải mã: D(x) = (x - n) mod 26`,
-    security: `🔴 **Rất yếu** — Chỉ có 25 khả năng dịch chuyển, dễ dàng brute-force. Chỉ mang tính lịch sử.`,
+![Cơ chế xoay vòng của hệ mật Caesar (Gemini-Banana Style)](/assets/caesar_theory.png)`,
+    howItWorks: `### 2. Nguyên lý Kỹ thuật
+Hệ mật này vận hành trên tập hợp các chữ cái Latinh (26 ký tự), trong đó mỗi ký tự được thay thế bằng một ký tự khác nằm cách nó một khoảng cách cố định $k$ trong bảng chữ cái tuần hoàn.
+
+#### 2.1 Biểu diễn Toán học
+Mỗi chữ cái được chuẩn hóa thành một số nguyên trong khoảng $[0, 25]$ (A=0, B=1, ..., Z=25).
+
+#### 2.2 Quy trình thực thi (Algorithms)
+
+**A. Thuật toán Mã hóa (Encryption):**
+Dịch chuyển giá trị đại diện của ký tự sang phải $k$ bước (với $k$ là khóa bí mật).
+
+$$ E_k(m) = (m + k) \\bmod 26 $$
+
+**B. Thuật toán Giải mã (Decryption):**
+Dịch chuyển ngược lại sang trái $k$ bước để khôi phục bản rõ ban đầu.
+
+$$ D_k(c) = (c - k) \\bmod 26 $$
+
+> **Lưu ý kỹ thuật:** Trong tính toán thực tế, nếu $(c - k) < 0$, ta thực hiện phép toán cộng thêm 26 để đảm bảo giá trị nằm trong trường hữu hạn $\\mathbb{Z}_{26}$.
+
+$$ (c - k) \\pmod{26} \\equiv (c - k + 26) \\bmod 26 $$
+
+---
+
+**Ví dụ thực nghiệm (với $k = 3$):**
+- **Bản rõ (Plaintext):** \`HELLO\`
+- **Tính toán:** $7+3=10$, $4+3=7$, $11+3=14$, $11+3=14$, $14+3=17$
+- **Bản mã (Ciphertext):** \`KHOOR\`
+`,
+    security: `### 3. Đánh giá An toàn & Thám mã
+Dưới góc độ an ninh mạng hiện đại, hệ mật Caesar được xếp vào nhóm **không an toàn** do hai yếu tố cốt lõi:
+
+1. **Không gian khóa hạn chế (Brute-force):** Chỉ tồn tại $25$ khóa khả thi (loại trừ $k=0$). Kẻ tấn công có thể dễ dàng thực hiện tấn công duyệt cạn (Exhaustive key search) trong thời gian ngắn.
+2. **Phân tích tần suất (Frequency Analysis):** Do tính chất thay thế đơn biểu, quy luật phân phối tần suất của các chữ cái trong ngôn ngữ tự nhiên (như chữ 'E' xuất hiện nhiều nhất trong tiếng Anh) không bị triệt tiêu, cho phép thám mã hiệu quả mà không cần biết khóa.`,
+    practice: {
+      question: `Sử dụng Mật mã Caesar với **khóa $k = 5$**, hãy mã hóa bản rõ sau (viết hoa liền nhau): **APPLE**`,
+      answer: `FUUQJ`,
+      explanation: `Dựa vào phép tịnh tiến $k=5$:
+- A (0) + 5 = 5 $\\rightarrow$ **F**
+- P (15) + 5 = 20 $\\rightarrow$ **U**
+- P (15) + 5 = 20 $\\rightarrow$ **U**
+- L (11) + 5 = 16 $\\rightarrow$ **Q**
+- E (4) + 5 = 9 $\\rightarrow$ **J**
+
+Nên kết quả là **FUUQJ**.`
+    }
   },
   vigenere: {
     title: 'Vigenère Cipher',
-    history: `Được Blaise de Vigenère phát triển vào thế kỷ 16, từng được gọi là "mật mã không thể phá" (le chiffre indéchiffrable) trong suốt 300 năm.`,
-    howItWorks: `Sử dụng một từ khóa (keyword) để tạo nhiều phép dịch chuyển khác nhau cho từng ký tự.
+    history: `Được phát triển vào thế kỷ 16, từng được gọi là "mật mã không thể phá" (le chiffre indéchiffrable). Đây là một dạng mật mã thay thế đa biểu (polyalphabetic substitution), giúp chống lại thành công phương pháp phân tích tần suất.
 
-**Ví dụ: Plaintext = "HELLO", Key = "KEY"**
-- H + K(10) = R
-- E + E(4) = I
-- L + Y(24) = J
-- L + K(10) = V
-- O + E(4) = S
-→ Ciphertext: "RIJVS"`,
-    security: `🟡 **Trung bình** — An toàn hơn Caesar nhưng vẫn có thể phá bằng phân tích tần suất (Kasiski) nếu biết độ dài key.`,
+![Hệ thống đĩa mã đa biểu Vigenère (Gemini-Banana Style)](/assets/vigenere_theory.png)`,
+    howItWorks: `Sử dụng một từ khóa lặp lại (keyword) để xác định phép dịch chuyển cho từng ký tự một. Mỗi ký tự trong từ khóa đóng vai trò như một khóa $K_i$ của bản thân nó trong hệ mã Caesar.
+
+**Bảng tra cứu chỉ số:**
+
+**Công thức chung:**
+- Mã hóa:
+$$ C_i = (M_i + K_i) \\bmod 26 $$
+- Giải mã:
+$$ M_i = (C_i - K_i + 26) \\bmod 26 $$
+
+**Ví dụ thực tế:**
+- Bản rõ $M_i$: \`HELLO\` → Toán học: (7, 4, 11, 11, 14)
+- Từ khóa $K_i$: \`KEY\` lặp lại thành \`KEYKE\` → Toán học: (10, 4, 24, 10, 4)
+- Mã hóa ($M_i+K_i$): (17, 8, 35, 21, 18) $\\bmod 26$ = (17, 8, 9, 21, 18) → Bản mã: \`RIJVS\``,
+    security: `🟡 **Trung bình/Yếu** — An toàn hơn Caesar vì một chữ cái trong bản rõ có thể biến thành nhiều chữ cái khác nhau trong bản mã tùy vị trí từ khóa. Tuy nhiên với máy tính hiện đại, kẻ tấn công có thể đo chiều dài khóa (phương pháp Kasiski) để dịch ngược hoàn toàn.`,
+    practice: {
+      question: `Sử dụng Mật mã Vigenère, mã hóa chữ **DOG** với từ khóa **PIG**. (gợi ý: P=15, I=8, G=6)`,
+      answer: `SWM`,
+      explanation: `Ta cộng giá trị của từng chữ cái Modulo 26:
+- **D** (3) + **P** (15) = 18 $\\rightarrow$ **S**
+- **O** (14) + **I** (8) = 22 $\\rightarrow$ **W**
+- **G** (6) + **G** (6) = 12 $\\rightarrow$ **M**
+
+Nên kết quả là **SWM**.`
+    }
   },
   atbash: {
     title: 'Atbash Cipher',
-    history: `Có nguồn gốc từ bảng chữ cái Hebrew cổ đại. Tên "Atbash" là ghép từ chữ cái đầu (Aleph) và cuối (Tav) của bảng chữ cái Hebrew.`,
-    howItWorks: `Đảo ngược vị trí mỗi ký tự trong bảng chữ cái.
+    history: `Có nguồn gốc từ ngôn ngữ Hebrew cổ đại. Tên "Atbash" lấy từ chữ cái đầu và cuối của bảng chữ cái. Đây là một mật mã thay thế đơn biểu đơn giản nhất do thao tác không hề cần đến từ khóa.
 
-**Quy tắc:**
-- A ↔ Z, B ↔ Y, C ↔ X, ...
-- "HELLO" → "SVOOL"
+![Tính đối xứng gương của Atbash (Gemini-Banana Style)](/assets/atbash_theory.png)`,
+    howItWorks: `Cơ chế cực kỳ đơn giản: **Đảo ngược vị trí mỗi ký tự** trong bảng chữ cái tương ứng. 
 
-Atbash là **tự nghịch đảo** — mã hóa 2 lần sẽ ra lại bản gốc.`,
-    security: `🔴 **Rất yếu** — Chỉ có 1 cách mã hóa duy nhất, dễ dàng nhận diện.`,
-  },
-  rot13: {
-    title: 'ROT13',
-    history: `ROT13 là trường hợp đặc biệt của Caesar Cipher với shift = 13. Phổ biến trên các diễn đàn Internet từ thập niên 1980 để ẩn spoiler hoặc nội dung nhạy cảm.`,
-    howItWorks: `Dịch chuyển mỗi chữ cái 13 vị trí. Vì bảng chữ cái có 26 ký tự nên ROT13 là **tự nghịch đảo**.
+**Bảng tra cứu lật ngược (Atbash Lookup Table):**
 
-**Ví dụ:**
-- "HELLO" → "URYYB"
-- "URYYB" → "HELLO" (giải mã = mã hóa lần nữa)`,
-    security: `🔴 **Không có tính bảo mật** — Chỉ dùng để che giấu nội dung tạm thời, không phải để bảo vệ dữ liệu.`,
+Đây là mã **tự nghịch đảo** — nghĩa là quy trình mã hóa và giải mã hoàn toàn giống hệt nhau. Bạn chỉ cần lấy chữ cái tương ứng từ bảng trên 1 lần. 
+*Ví dụ:* "HELLO" → "SVOOL" và giải mã "SVOOL" → "HELLO".`,
+    security: `🔴 **Vô cùng yếu** — Hoàn toàn không cấu thành một không gian khóa bảo mật. Bất kỳ ai nhận thấy đây là mã Atbash đều có thể lật bảng chữ cái và dịch ngay lập tức mà không cần đoán mật khẩu.`,
+    practice: {
+      question: `Sử dụng bảng mật mã Atbash ở phần lý thuyết, hãy giải mã bản mã sau: **KVM**`,
+      answer: `PEN`,
+      explanation: `Tra bảng lật ngược trên phần lý thuyết:
+- K $\rightarrow$ P
+- V $\rightarrow$ E
+- M $\rightarrow$ N
+
+Kết quả giải mã là **PEN**.`
+    }
   },
   xor: {
-    title: 'XOR Cipher',
-    history: `XOR (Exclusive OR) là nền tảng của nhiều thuật toán mã hóa hiện đại. One-Time Pad (OTP) — mật mã duy nhất không thể phá — cũng dựa trên XOR.`,
-    howItWorks: `Mỗi byte của plaintext được XOR với byte tương ứng của key.
+    title: 'XOR Cipher (Hệ mật Vernam)',
+    history: `Mật mã dòng sử dụng phép toán logic đại số Boolean XOR để kết hợp bit (hoặc ký tự) dữ liệu gốc với bit (hoặc ký tự) khóa. Hệ mật One-Time Pad nguyên thủy được Vernam phát minh dựa trên nền tảng cơ bản của XOR.
 
-**Tính chất XOR:**
-- A ⊕ B ⊕ B = A (tự nghịch đảo)
-- 0 ⊕ 0 = 0, 1 ⊕ 1 = 0
-- 0 ⊕ 1 = 1, 1 ⊕ 0 = 1
+![Phép toán Logic Bitwise XOR (Gemini-Banana Style)](/assets/xor_theory.png)`,
+    howItWorks: `### 2. Nguyên lý Kỹ thuật
+Mã hóa và giải mã điều khiển dữ liệu qua phép toán Bitwise XOR (đại diện là dấu $\\oplus$).
 
-**Ví dụ:** 'H' (72) ⊕ 'K' (75) = 3 → mã hóa
-3 ⊕ 'K' (75) = 72 → 'H' giải mã`,
-    security: `🟡 **Phụ thuộc vào key** — Nếu key ngắn hơn plaintext và lặp lại → yếu. Nếu key dài ngẫu nhiên bằng plaintext → không thể phá (One-Time Pad).`,
+#### 2.1 Bảng Chân Lý XOR (Mệnh đề Logic)
+Cơ chế XOR trả về giá trị **1** khi hai đầu vào khác nhau, và trả về **0** khi hai đầu vào giống nhau. Đây là "hạt nhân" của hầu hết các hệ mật mã học hiện đại.
+
+**Tính chất Tự nghịch đảo xuất sắc:**
+$$ A \\oplus B \\oplus B = A $$
+Do tính đối xứng này, quá trình mã hóa và giải mã thực chất diễn ra bằng cùng cấu trúc toán học:
+- **Mã hóa:**
+$$ c_i = m_i \\oplus z_i $$
+- **Giải mã:**
+$$ m_i = c_i \\oplus z_i $$
+
+*(Trong đó $z_i$ là các bit dữ liệu từ dòng khóa mã được sinh ngẫu nhiên)*`,
+    security: `Đạt độ an toàn tuyệt đối (Perfect Secrecy) nếu và chỉ nếu khóa được sử dụng duy nhất một lần, phải ngẫu nhiên hoàn toàn và dài bằng văn bản (One-Time Pad). Trong thực tế, các bộ tạo giả ngẫu nhiên (chẳng hạn như RC4 hoặc LFSR) có thể bị hack nếu tái sử dụng khóa.`,
+    practice: {
+      question: `Thực hiện quy tắc phép toán XOR giữa hai chuỗi bit nhị phân sau để ra kết quả cuối:
+- Dữ liệu $m$: **1010**
+- Khóa $k$: **1100**`,
+      answer: `0110`,
+      explanation: `Áp dụng bảng chân lý XOR cho từng cặp bit đối xứng từ trái sang phải:
+- 1 $\\oplus$ 1 = 0
+- 0 $\\oplus$ 1 = 1
+- 1 $\\oplus$ 0 = 1
+- 0 $\\oplus$ 0 = 0
+
+Nối kết quả lại ta được: **0110**`
+    }
   },
   aes: {
     title: 'AES (Advanced Encryption Standard)',
-    history: `AES được NIST chọn làm tiêu chuẩn mã hóa năm 2001, thay thế DES. Được thiết kế bởi Joan Daemen và Vincent Rijmen (Rijndael). AES được sử dụng rộng rãi trong HTTPS, WiFi (WPA2), VPN, v.v.`,
-    howItWorks: `AES là mã khối (block cipher) hoạt động trên khối 128 bit.
+    history: `AES (thuật toán Rijndael) chiến thắng cuộc thi của NIST năm 2000, ban hành chuẩn năm 2001 thay thế DES vì DES không còn an toàn. Khối dữ liệu: 128 bit. Khóa: 128, 192 hoặc 256 bit với số vòng lặp tương ứng 10, 12, 14. Thiết kế theo mạng thay thế-hoán vị (SPN).
 
-**Các bước chính:**
-1. SubBytes — thay thế byte qua S-box
-2. ShiftRows — dịch hàng byte
-3. MixColumns — trộn cột
-4. AddRoundKey — XOR với round key
+![Ma trận trạng thái và biến đổi AES (Gemini-Banana Style)](/assets/aes_theory.png)`,
+    howItWorks: `Dữ liệu trong AES biểu diễn dưới dạng ma trận state $4 \\times 4$ byte. Mỗi vòng lặp thực hiện 4 biến đổi:
+1. **SubBytes**: Thế byte phi tuyến qua các S-box (Lookup table hỗn loạn sinh sẵn).
+2. **ShiftRows**: Dịch chuyển các hàng của ma trận state tạo hiệu ứng phân kỳ (Diffusion).
+3. **MixColumns**: Nhân ma trận các cột trên trường hữu hạn $GF(2^8)$.
+4. **AddRoundKey**: Trộn trạng thái hiện thời với khóa con vòng $K_i$ bằng thao tác XOR.
 
-**Key size:** 128 / 192 / 256 bit
-**Mode:** ECB (đơn giản, không an toàn), CBC (an toàn hơn, cần IV)`,
-    security: `🟢 **Rất mạnh** — Tiêu chuẩn toàn cầu, không có lỗ hổng thực tế được biết đến.`,
+Phép giải mã dùng biến đổi ma trận nghịch đảo để lùi dữ liệu về trạng thái nguyên bản.`,
+    security: `🟢 **Rất mạnh** — Không có kỹ thuật tấn công toán học nào có thể phá vỡ cốt lõi AES trong thời gian khả thi bằng PC hiện nay. Hacker thường chỉ nhắm đến các lỗ hổng phần cứng rò rỉ (Side Channel Attack).`,
+    practice: {
+      question: `Trong 4 bước thực thi của một vòng lặp AES, bước nào chịu trách nhiệm *thế byte phi tuyến tính* phụ thuộc vào một hộp tra cứu (S-box)? (Nhập đúng tên tiếng anh)`,
+      answer: `SubBytes`,
+      explanation: `Đó là bước **SubBytes**. ShiftRows chỉ dịch hàng, MixColumns trộn dữ liệu các cột, còn AddRoundKey là chỉ tiến hành cộng Modulo (XOR) với khóa vòng.`
+    }
   },
   des: {
-    title: 'DES / 3DES',
-    history: `DES (Data Encryption Standard) được IBM phát triển năm 1970 và trở thành tiêu chuẩn liên bang Mỹ năm 1977. Do key chỉ 56 bit nên đã bị phá vào 1999. 3DES mã hóa 3 lần DES để tăng độ an toàn.`,
-    howItWorks: `DES là mã khối 64 bit với key 56 bit, sử dụng mạng Feistel 16 vòng.
+    title: 'DES / 3DES (Sử dụng Mạng Feistel)',
+    history: `DES là chuẩn mã khối đời đầu, sử dụng Cấu trúc Mạng lưới Feistel (do Horst Feistel phát minh). Hiện tại tiêu chuẩn này đã lạc hậu. 3DES sử dụng thuật toán DES 3 lần liên tiếp cho một khối dữ liệu để khôi phục khả năng phòng thủ.
 
-**3DES:** Encrypt(K1) → Decrypt(K2) → Encrypt(K3)
-Với 3 key khác nhau → key hiệu dụng 168 bit.`,
-    security: `🟡 **DES: Yếu** (key 56 bit). **3DES: Trung bình** — an toàn hơn nhưng chậm, đang bị thay thế bởi AES.`,
+![Cấu trúc Mạng Feistel trong DES (Gemini-Banana Style)](/assets/des_theory.png)`,
+    howItWorks: `Mạng Feistel chia khối dữ liệu làm 2 nửa trái (L/Left) và phải (R/Right).
+Tại mỗi vòng lặp thứ $i$:
+- Nửa trái sao chép nửa phải cũ: 
+$$ L_i = R_{i-1} $$
+- Nửa phải kết hợp XOR với hàm vòng $F$:
+$$ R_i = L_{i-1} \\oplus F(R_{i-1}, K_i) $$
+*(Với $F$ là hàm vòng biến đổi dữ liệu phi tuyến (chứa phép mở rộng, thế S-boxes, xáo trộn), $K_i$ là khóa phụ sinh từ Key chính)*
+
+Đặc trưng mạng Feistel: Mã hóa và giải mã sử dụng chung một cấu trúc mạch vi điện tử duy nhất, chu kỳ giải mã bản chất chỉ là chạy mã hóa nhưng nạp khóa vòng $K_i$ ngược lại từ dưới lên.`,
+    security: `🟡 **Yếu dần** — Chìa khóa DES nguyên bản 56-bit đã bị bẻ mặt từ lâu bằng siêu máy tính vét cạn (EFF DES cracker). 3DES an toàn hơn nhờ khóa lên tới 168-bit nhưng xử lý tốn CPU và chậm hơn AES rất nhiều.`,
+    practice: {
+      question: `Tên của cấu trúc/mạng lưới mà thuật toán DES sử dụng để phân đôi khối dữ liệu $L_i$ and $R_i$ đảo chéo qua các vòng lặp là gì? (Tên nhà khoa học Horst ...)`,
+      answer: `Feistel`,
+      explanation: `Đó là Cấu trúc **Mạng Feistel**. Cấu trúc này nổi tiếng ở điểm mạch mã hóa và giải mã có thể dùng chung một luồng, vì cơ chế XOR song hành.`
+    }
   },
   rsa: {
-    title: 'RSA (Rivest–Shamir–Adleman)',
-    history: `RSA được công bố năm 1977 bởi Ron Rivest, Adi Shamir và Leonard Adleman. Là thuật toán mã hóa bất đối xứng đầu tiên được sử dụng rộng rãi.`,
-    howItWorks: `Dựa trên bài toán **phân tích thừa số nguyên tố** (rất khó với số lớn).
+    title: 'RSA (Thuật toán Mã hóa Khóa Công Khai)',
+    history: `Là hệ mật phi đối xứng vững chãi và áp dụng cực kì thành công trong Internet Security hiện đại (HTTPS, TLS), đi vào đời sống từ các khái niệm của lý thuyết số nguyên tố.
 
-**Tạo key:**
-1. Chọn 2 số nguyên tố lớn p, q
-2. n = p × q, φ(n) = (p-1)(q-1)
-3. Chọn e sao cho gcd(e, φ(n)) = 1
-4. Tính d = e⁻¹ mod φ(n)
-- **Public key:** (n, e)
-- **Private key:** (n, d)
+![Nguyên lý Sinh khóa RSA từ Số nguyên tố (Gemini-Banana Style)](/assets/rsa_theory.png)`,
+    howItWorks: `Khóa public and private là cặp khóa không cân xứng.
+**Sinh khóa (Cơ sở toán đại số logic)**:
+1. Chọn 2 số nguyên tố siêu lớn bí mật $p, q$. Tính modul $n$ và hàm Euler $\\phi(n)$:
+$$ n = p \\times q $$
+$$ \\phi(n) = (p-1)(q-1) $$
+2. Chọn số mũ công khai $e$ (thường là $65537$):
+$$ \\gcd(e, \\phi(n)) = 1 $$
+3. Tính khóa bí mật $d$ (nghịch đảo của $e$ trong modulo $\\phi$):
+$$ e \\cdot d \\equiv 1 \\pmod{\\phi(n)} $$
+- **Khóa Công khai (Public Key):** $(n, e)$
+- **Khóa Bí mật (Private Key):** $(n, d)$
 
-**Mã hóa:** C = M^e mod n
-**Giải mã:** M = C^d mod n`,
-    security: `🟢 **Mạnh** (với key ≥ 2048 bit). Nền tảng của HTTPS, chữ ký số.`,
+**Định lượng Toán Học**:
+- **Mã hóa (Mã hóa tin):**
+$$ c = m^e \\bmod n $$
+- **Tại máy chủ (Giải mã tin):**
+$$ m = c^d \\bmod n $$
+*(Chứng minh bằng Euler-Fermat: $m^{ed} \\equiv m \\pmod n$)*`,
+    security: `🟢 **Rất mạnh** — Dựa trên thời gian cực hạn của bài toán phân tích thừa số lượng tử phân mảnh. Hiện nay yêu cầu khóa lớn (>= 2048 bit). Do tốc độ quá tốn kém hệ thống, khóa RSA thường chỉ gói thông điệp chìa khóa phiên (Key Exchange) để nhường đường cho mã khối đối xứng tải dữ liệu.`,
+    practice: {
+      question: `Trong giai đoạn Sinh khóa RSA: Hãy chọn 2 số nguyên tố giả thiết siêu nhỏ $p = 7, q = 11$. Hãy tính giá trị Modulo lõi hệ thống **n** bằng bao nhiêu?`,
+      answer: `77`,
+      explanation: `Cơ sở của mã RSA là tích phần của hai số nguyên tố rất lớn.\n$n = p \\times q = 7 \\times 11 = 77$. \n\nTrong thực tế người ta dùng $p, q$ có hàng trăm chữ số để kẻ xấu không thể phân tích ngược $77$ thành $7 \\times 11$ được!`
+    }
   },
   'rsa-signature': {
     title: 'Chữ ký số RSA',
-    history: `Chữ ký số là ứng dụng quan trọng nhất của mã hóa bất đối xứng. Dùng để xác thực danh tính người gửi và đảm bảo dữ liệu không bị thay đổi.`,
-    howItWorks: `**Ký (Sign):**
-1. Hash thông điệp → H(M)
-2. Ký bằng private key: S = H(M)^d mod n
+    history: `Đây là giải pháp hoàn chỉnh cho chứng thực danh tính (Authentication), bảo vệ toàn vẹn (Integrity) và chống thoái thác trách nhiệm (Non-repudiation) khi giao dịch trực tuyến.
 
-**Xác minh (Verify):**
-1. Hash thông điệp → H(M)
-2. Giải mã chữ ký: H' = S^e mod n
-3. So sánh H(M) == H' → ✅ Hợp lệ / ❌ Không hợp lệ
+![Chữ ký điện tử và Xác thực RSA (Gemini-Banana Style)](/assets/rsa_signature_theory.png)`,
+    howItWorks: `Chữ ký RSA thực chất là hoán đổi công năng của Khóa Private và Public trên mã RSA.
+**Lượt ký (thực thi trên ngón tay Private $d$)**:
+Để xác nhận, người gửi băm Hash dữ liệu $H(m)$ và nhúng chìa khóa Private:
+$$ s = (H(m))^d \\bmod n $$
 
-**Ứng dụng:** SSL/TLS certificate, PDF signing, email S/MIME.`,
-    security: `🟢 **Mạnh** — Không thể giả mạo chữ ký mà không có private key.`,
+**Lượt kiểm tra (bất kỳ ai cầm chìa Public $e$)**:
+Trích xuất Hash bằng Public Key:
+$$ h' = s^e \\bmod n $$
+Đồng thời, tự tay băm dữ liệu gốc ra $h$. Nếu $h' = h$, chứng tỏ chỉ có người giữ khóa $d$ mới tạo ra được $s$.
+*(Toán học: $s^e = (h^d)^e = h^{ed} \\equiv h$)*`,
+    security: `Là trụ cột của hạ tầng lưu trữ khóa công khai X.509/PKI. Chỉ cần cất giấu kỹ $d$, Chữ ký số RSA miễn nhiễm với nguy cơ làm giả điện tử.`,
+    practice: {
+      question: `Khi Bob muốn gửi một hợp đồng điện tử được *Ký số đại diện* bởi Bob cho Alice, Bob phải dùng loại hàm khóa nào của chính mình để mã hóa Chữ ký gốc? (Nhập "Public" hoặc "Private")`,
+      answer: `Private`,
+      explanation: `Theo nguyên lý Xác thực Điện tử (Authentication), người gửi phải kí nhận chứng chỉ bằng **Khóa Private (Bí mật)** của chính họ để làm bảo chứng. Mọi người khác (kể cả Alice) sẽ tốn công giải mã đối chiếu bằng Khóa Public để kiểm tra.`
+    }
   },
   hash: {
-    title: 'Hàm băm (MD5, SHA)',
-    history: `MD5 được Ronald Rivest tạo ra năm 1991. SHA (Secure Hash Algorithm) được NSA thiết kế. SHA-256 là một phần của SHA-2, sử dụng trong Bitcoin và nhiều ứng dụng bảo mật.`,
-    howItWorks: `Hàm băm biến đổi dữ liệu bất kỳ thành chuỗi có **độ dài cố định**.
+    title: 'Hàm băm (Hash Functions)',
+    history: `Function nghiền mịn và "tóm lược" data không giới hạn thành "vân tay thông điệp" độ dài cố định. Các dòng tiêu biểu: MD5, SHA-1, và tiêu chuẩn cao nhất hiện giờ là SHA-2 / SHA-3.
 
-**Tính chất:**
-- **Một chiều:** Không thể tìm ngược input từ hash
-- **Chống va chạm:** Khó tìm 2 input cho cùng hash
-- **Hiệu ứng tuyết lở:** Thay đổi 1 bit → hash thay đổi hoàn toàn
+![Minh họa cơ chế Hàm băm (Gemini-Banana Style)](/assets/hash_theory.png)`,
+    howItWorks: `Quá trình thực thi $h = H(m)$ dùng vô vàn hàm cộng toán và XOR tuyến nghịch, **không có khóa** và **không có hàm nghịch đảo**.
 
-| Thuật toán | Độ dài output |
-|-----------|--------------|
-| MD5 | 128 bit (32 hex) |
-| SHA-1 | 160 bit (40 hex) |
-| SHA-256 | 256 bit (64 hex) |
-| SHA-512 | 512 bit (128 hex) |`,
-    security: `🔴 **MD5, SHA-1: Yếu** (đã tìm thấy va chạm). 🟢 **SHA-256, SHA-512: Mạnh.**`,
-  },
-  base64: {
-    title: 'Base64 Encoding',
-    history: `Base64 được phát triển để truyền dữ liệu nhị phân qua các giao thức chỉ hỗ trợ ASCII, như email (MIME).`,
-    howItWorks: `Chuyển mỗi 3 byte (24 bit) thành 4 ký tự Base64 (6 bit/ký tự).
+#### 2.2 Cấu trúc Thuật toán MD5
+MD5 là một ví dụ điển hình của cấu trúc băm khối. Dữ liệu văn bản được chia thành các khối 512-bit. Sau đó, nó sử dụng **4 thanh ghi 32-bit** (A, B, C, D) làm trạng thái trung gian.
 
-**Bảng ký tự:** A-Z, a-z, 0-9, +, / (và = để padding)
+![Sơ đồ 4 thanh ghi A-B-C-D và quy trình 64 vòng băm của MD5 (Gemini-Banana Style)](/assets/md5_theory.png)
 
-**Ví dụ:** "Hi" → "SGk="
-- 'H' = 72, 'i' = 105
-- Binary: 01001000 01101001
-- Chia nhóm 6 bit: 010010 000110 1001(00)
-- Index: 18, 6, 36 → S, G, k, =`,
-    security: `🔴 **Không có tính bảo mật** — Base64 là encoding, KHÔNG phải encryption. Ai cũng có thể decode.`,
-  },
-  'hex-binary': {
-    title: 'Hex / Binary Convert',
-    history: `Hex (thập lục phân) và Binary (nhị phân) là hệ đếm cơ bản trong khoa học máy tính, được sử dụng rộng rãi trong lập trình và phân tích dữ liệu.`,
-    howItWorks: `**Hex (cơ số 16):** dùng 0-9 và A-F
-- Mỗi ký tự Hex = 4 bit
-- "Hi" → "48 69"
+Thông điệp trải qua 64 vòng lặp (với các hàm phi tuyến $F, G, H, I$), trộn lẫn trạng thái của 4 thanh ghi này để sản sinh ra chuỗi vân tay cuối cùng dài **128-bit**.
 
-**Binary (cơ số 2):** dùng 0 và 1
-- Mỗi ký tự ASCII = 8 bit
-- "Hi" → "01001000 01101001"`,
-    security: `🔴 **Không có tính bảo mật** — Chỉ là thay đổi cách biểu diễn, không mã hóa.`,
-  },
+#### 2.3 Đánh giá An toàn
+Hiện nay, MD5 được coi là **đã bị phá vỡ hoàn toàn** trong lĩnh vực an ninh vì khả năng xảy ra va chạm (Collision) là rất cao bằng máy tính cá nhân thông thường. Tuy nhiên, nó vẫn được dùng để kiểm tra tính toàn vẹn (Checksum) cho các file không yêu cầu tính bảo mật tuyệt mật.`,
+    practice: {
+      question: `Thuật toán băm đòi hỏi tính chất bảo vệ nào để kẻ gian "Không thể lấy chuỗi mã $h$ và dịch ngược tìm ra văn bản $m$ gốc"? (Gợi ý nằm trong từ Kháng ... ảnh)`,
+      answer: `Kháng tiền ảnh`,
+      explanation: `Đó là lý thuyết **Kháng tiền ảnh 1 chiều** (Pre-image Resistance). Hàm băm là hàm bất thuận nghịch, nó băm nát và trộn lẫn các bit dữ liệu chứ không mã hóa nguyên sơ để giải lại được.`
+    }
+  }
 };
 
 export default theories;

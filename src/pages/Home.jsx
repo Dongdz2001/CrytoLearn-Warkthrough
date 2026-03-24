@@ -13,13 +13,6 @@ export default function Home() {
 
       {cipherCategories.map((category) => (
         <div key={category.id} className="category-section fade-in">
-          <div className="category-header">
-            <span className="category-icon">{category.icon}</span>
-            <h2 className="category-title" style={{ color: category.color }}>
-              {category.name}
-            </h2>
-            <span className="category-desc">{category.description}</span>
-          </div>
 
           {category.subcategories.map((sub) => (
             <div key={sub.id}>
