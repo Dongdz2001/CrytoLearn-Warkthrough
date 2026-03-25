@@ -57,8 +57,8 @@ export const cipherCategories = [
           },
           {
             id: 'des',
-            name: 'DES / 3DES',
-            description: 'Data Encryption Standard và Triple DES.',
+            name: 'Triple DES (3DES)',
+            description: 'Tìm hiểu về Data Encryption Standard và sự cải tiến Triple DES.',
             icon: '🔐',
             difficulty: 'Khó',
           },
@@ -87,8 +87,8 @@ export const cipherCategories = [
         ciphers: [
           {
             id: 'hash',
-            name: 'MD5 / SHA',
-            description: 'Các hàm băm MD5, SHA-1, SHA-256, SHA-512.',
+            name: 'MD5 Hash',
+            description: 'Giải mã cấu trúc và quy trình băm khối của thuật toán MD5.',
             icon: '#️⃣',
             difficulty: 'Trung bình',
           },

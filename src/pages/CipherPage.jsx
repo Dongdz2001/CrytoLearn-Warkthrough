@@ -165,6 +165,15 @@ export default function CipherPage() {
                       />
                     </div>
                   )}
+
+                  {id === 'vigenere' && (
+                    <div style={{ marginTop: '25px' }}>
+                      <div style={{ fontWeight: 'bold', color: '#1e293b', marginBottom: '12px', fontSize: '0.9rem', fontFamily: 'var(--font-primary)' }}>
+                        <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>🔢 Bảng tra cứu chỉ số (Vigenère Lookup Table):</ReactMarkdown>
+                      </div>
+                      <AlphabetTable />
+                    </div>
+                  )}
                 </div>
               )}
 

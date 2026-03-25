@@ -61,18 +61,26 @@ Nên kết quả là **FUUQJ**.`
 ![Hệ thống đĩa mã đa biểu Vigenère (Gemini-Banana Style)](/assets/vigenere_theory.png)`,
     howItWorks: `Sử dụng một từ khóa lặp lại (keyword) để xác định phép dịch chuyển cho từng ký tự một. Mỗi ký tự trong từ khóa đóng vai trò như một khóa $K_i$ của bản thân nó trong hệ mã Caesar.
 
-**Bảng tra cứu chỉ số:**
+**Bảng tra cứu chỉ số chữ cái (A=0, B=1...):**
+| A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10| 11| 12| 13| 14| 15| 16| 17| 18| 19| 20| 21| 22| 23| 24| 25|
 
 **Công thức chung:**
-- Mã hóa:
-$$ C_i = (M_i + K_i) \\bmod 26 $$
-- Giải mã:
-$$ M_i = (C_i - K_i + 26) \\bmod 26 $$
+- **Mã hóa:** $C_i = (M_i + K_i) \\pmod{26}$
+- **Giải mã:** $M_i = (C_i - K_i + 26) \\pmod{26}$
 
-**Ví dụ thực tế:**
-- Bản rõ $M_i$: \`HELLO\` → Toán học: (7, 4, 11, 11, 14)
-- Từ khóa $K_i$: \`KEY\` lặp lại thành \`KEYKE\` → Toán học: (10, 4, 24, 10, 4)
-- Mã hóa ($M_i+K_i$): (17, 8, 35, 21, 18) $\\bmod 26$ = (17, 8, 9, 21, 18) → Bản mã: \`RIJVS\``,
+**Ví dụ thực nghiệm:**
+Ta mã hóa từ \`HELLO\` với từ khóa \`KEY\`:
+- **Bản rõ $M_i$:** \`H(7), E(4), L(11), L(11), O(14)\`
+- **Từ khóa $K_i$:** \`KEY\` (lặp lại thành \`KEYKE\`) $\\rightarrow$ \`K(10), E(4), Y(24), K(10), E(4)\`
+- **Cộng (Modulo 26):**
+  - $7+10=17 \\rightarrow$ **R**
+  - $4+4=8 \\rightarrow$ **I**
+  - $11+24=35 \\equiv 9 \\rightarrow$ **J**
+  - $11+10=21 \\rightarrow$ **V**
+  - $14+4=18 \\rightarrow$ **S**
+- **Kết quả bản mã:** \`RIJVS\``,
     security: `🟡 **Trung bình/Yếu** — An toàn hơn Caesar vì một chữ cái trong bản rõ có thể biến thành nhiều chữ cái khác nhau trong bản mã tùy vị trí từ khóa. Tuy nhiên với máy tính hiện đại, kẻ tấn công có thể đo chiều dài khóa (phương pháp Kasiski) để dịch ngược hoàn toàn.`,
     practice: {
       question: `Sử dụng Mật mã Vigenère, mã hóa chữ **DOG** với từ khóa **PIG**. (gợi ý: P=15, I=8, G=6)`,
@@ -127,7 +135,20 @@ $$ c_i = m_i \\oplus z_i $$
 - **Giải mã:**
 $$ m_i = c_i \\oplus z_i $$
 
-*(Trong đó $z_i$ là các bit dữ liệu từ dòng khóa mã được sinh ngẫu nhiên)*`,
+*(Trong đó $z_i$ là các bit dữ liệu từ dòng khóa mã được sinh ngẫu nhiên)*
+
+---
+
+**Ví dụ thực nghiệm (Toán nhị phân):**
+- **Bản rõ $m$:** \`1101\`
+- **Khóa $k$:** \`1011\`
+- **Mã hóa ($m \\oplus k$):**
+  - $1 \\oplus 1 = 0$
+  - $1 \\oplus 0 = 1$
+  - $0 \\oplus 1 = 1$
+  - $1 \\oplus 1 = 0$
+- **Bản mã $c$:** \`0110\`
+`,
     security: `Đạt độ an toàn tuyệt đối (Perfect Secrecy) nếu và chỉ nếu khóa được sử dụng duy nhất một lần, phải ngẫu nhiên hoàn toàn và dài bằng văn bản (One-Time Pad). Trong thực tế, các bộ tạo giả ngẫu nhiên (chẳng hạn như RC4 hoặc LFSR) có thể bị hack nếu tái sử dụng khóa.`,
     practice: {
       question: `Thực hiện quy tắc phép toán XOR giữa hai chuỗi bit nhị phân sau để ra kết quả cuối:
@@ -154,7 +175,16 @@ Nối kết quả lại ta được: **0110**`
 3. **MixColumns**: Nhân ma trận các cột trên trường hữu hạn $GF(2^8)$.
 4. **AddRoundKey**: Trộn trạng thái hiện thời với khóa con vòng $K_i$ bằng thao tác XOR.
 
-Phép giải mã dùng biến đổi ma trận nghịch đảo để lùi dữ liệu về trạng thái nguyên bản.`,
+Phép giải mã dùng biến đổi ma trận nghịch đảo để lùi dữ liệu về trạng thái nguyên bản.
+
+---
+
+**Ví dụ thực nghiệm (Phép thế SubBytes):**
+Giả sử có 1 byte trong ma trận trạng thái là \`0x19\`. 
+- Tra bảng S-Box tại hàng 1, cột 9.
+- Kết quả nhận được là \`0xd4\`.
+- Sau đó, byte này sẽ được dịch hàng (ShiftRows) và trộn cột (MixColumns) để lan tỏa sự thay đổi ra toàn bộ 16 byte của khối.
+`,
     security: `🟢 **Rất mạnh** — Không có kỹ thuật tấn công toán học nào có thể phá vỡ cốt lõi AES trong thời gian khả thi bằng PC hiện nay. Hacker thường chỉ nhắm đến các lỗ hổng phần cứng rò rỉ (Side Channel Attack).`,
     practice: {
       question: `Trong 4 bước thực thi của một vòng lặp AES, bước nào chịu trách nhiệm *thế byte phi tuyến tính* phụ thuộc vào một hộp tra cứu (S-box)? (Nhập đúng tên tiếng anh)`,
@@ -163,10 +193,10 @@ Phép giải mã dùng biến đổi ma trận nghịch đảo để lùi dữ l
     }
   },
   des: {
-    title: 'DES / 3DES (Sử dụng Mạng Feistel)',
-    history: `DES là chuẩn mã khối đời đầu, sử dụng Cấu trúc Mạng lưới Feistel (do Horst Feistel phát minh). Hiện tại tiêu chuẩn này đã lạc hậu. 3DES sử dụng thuật toán DES 3 lần liên tiếp cho một khối dữ liệu để khôi phục khả năng phòng thủ.
+    title: 'Triple DES (3DES) & Mạng Feistel',
+    history: `Mật mã Triple DES (3DES) là phiên bản nâng cấp của chuẩn mã khối DES nguyên bản, sử dụng Cấu trúc Mạng lưới Feistel (do Horst Feistel phát minh). Trong khi DES đã trở nên lạc hậu, **Triple DES** đã giải quyết lỗ hổng bảo mật bằng cách áp dụng thuật toán DES ba lần liên tiếp cho từng khối dữ liệu, tăng cường đáng kể khả năng phòng thủ trước các cuộc tấn công Brute-force.
 
-![Cấu trúc Mạng Feistel trong DES (Gemini-Banana Style)](/assets/des_theory.png)`,
+![Cấu trúc Mạng Feistel trong Triple DES (Gemini-Banana Style)](/assets/des_theory.png)`,
     howItWorks: `Mạng Feistel chia khối dữ liệu làm 2 nửa trái (L/Left) và phải (R/Right).
 Tại mỗi vòng lặp thứ $i$:
 - Nửa trái sao chép nửa phải cũ: 
@@ -175,7 +205,20 @@ $$ L_i = R_{i-1} $$
 $$ R_i = L_{i-1} \\oplus F(R_{i-1}, K_i) $$
 *(Với $F$ là hàm vòng biến đổi dữ liệu phi tuyến (chứa phép mở rộng, thế S-boxes, xáo trộn), $K_i$ là khóa phụ sinh từ Key chính)*
 
-Đặc trưng mạng Feistel: Mã hóa và giải mã sử dụng chung một cấu trúc mạch vi điện tử duy nhất, chu kỳ giải mã bản chất chỉ là chạy mã hóa nhưng nạp khóa vòng $K_i$ ngược lại từ dưới lên.`,
+Đặc trưng mạng Feistel: Mã hóa và giải mã sử dụng chung một cấu trúc mạch vi điện tử duy nhất, chu kỳ giải mã bản chất chỉ là chạy mã hóa nhưng nạp khóa vòng $K_i$ ngược lại từ dưới lên.
+
+---
+
+**Ví dụ thực nghiệm (Vòng lặp Feistel):**
+Giả sử khối 64-bit được chia thành $L_0$ và $R_0$.
+- **Vòng 1:**
+  - $L_1 = R_0$
+  - $R_1 = L_0 \\oplus F(R_0, K_1)$
+- **Vòng 2:**
+  - $L_2 = R_1$
+  - $R_2 = L_1 \\oplus F(R_1, K_2)$
+Quá trình này lặp lại 16 lần để tạo ra bản mã cuối cùng.
+`,
     security: `🟡 **Yếu dần** — Chìa khóa DES nguyên bản 56-bit đã bị bẻ mặt từ lâu bằng siêu máy tính vét cạn (EFF DES cracker). 3DES an toàn hơn nhờ khóa lên tới 168-bit nhưng xử lý tốn CPU và chậm hơn AES rất nhiều.`,
     practice: {
       question: `Tên của cấu trúc/mạng lưới mà thuật toán DES sử dụng để phân đôi khối dữ liệu $L_i$ and $R_i$ đảo chéo qua các vòng lặp là gì? (Tên nhà khoa học Horst ...)`,
@@ -227,8 +270,18 @@ $$ s = (H(m))^d \\bmod n $$
 Trích xuất Hash bằng Public Key:
 $$ h' = s^e \\bmod n $$
 Đồng thời, tự tay băm dữ liệu gốc ra $h$. Nếu $h' = h$, chứng tỏ chỉ có người giữ khóa $d$ mới tạo ra được $s$.
-*(Toán học: $s^e = (h^d)^e = h^{ed} \\equiv h$)*`,
-    security: `Là trụ cột của hạ tầng lưu trữ khóa công khai X.509/PKI. Chỉ cần cất giấu kỹ $d$, Chữ ký số RSA miễn nhiễm với nguy cơ làm giả điện tử.`,
+*(Toán học: $s^e = (h^d)^e = h^{ed} \\equiv h$)*
+
+---
+
+**Ví dụ thực nghiệm (Số nhỏ):**
+Giả sử $n=33, e=3, d=7$ (Khóa RSA đã sinh).
+Thông điệp băm có giá trị $h = 10$.
+1. **Người ký:** $s = 10^7 \\bmod 33 = 10$
+2. **Người nhận:** $h' = 10^3 \\bmod 33 = 10$
+Vì $h' = h = 10$, chữ ký hợp lệ.
+`,
+    security: `🟢 **An toàn cao** — Chữ ký số RSA rất khó làm giả nếu khóa Private $d$ được bảo mật tốt. Nó là nền tảng của các chứng chỉ SSL/TLS hiện nay.`,
     practice: {
       question: `Khi Bob muốn gửi một hợp đồng điện tử được *Ký số đại diện* bởi Bob cho Alice, Bob phải dùng loại hàm khóa nào của chính mình để mã hóa Chữ ký gốc? (Nhập "Public" hoặc "Private")`,
       answer: `Private`,
@@ -236,8 +289,8 @@ $$ h' = s^e \\bmod n $$
     }
   },
   hash: {
-    title: 'Hàm băm (Hash Functions)',
-    history: `Function nghiền mịn và "tóm lược" data không giới hạn thành "vân tay thông điệp" độ dài cố định. Các dòng tiêu biểu: MD5, SHA-1, và tiêu chuẩn cao nhất hiện giờ là SHA-2 / SHA-3.
+    title: 'Hàm băm MD5 (MD5 Hash Function)',
+    history: `Thuật toán băm (Hash Function) thực hiện việc biến đổi một khối dữ liệu không giới hạn thành một "vân tay thông điệp" có độ dài cố định. Trong đó, MD5 là một trong những chuẩn băm phổ biến nhất trong lịch sử máy tính.
 
 ![Minh họa cơ chế Hàm băm (Gemini-Banana Style)](/assets/hash_theory.png)`,
     howItWorks: `Quá trình thực thi $h = H(m)$ dùng vô vàn hàm cộng toán và XOR tuyến nghịch, **không có khóa** và **không có hàm nghịch đảo**.
@@ -249,8 +302,14 @@ MD5 là một ví dụ điển hình của cấu trúc băm khối. Dữ liệu 
 
 Thông điệp trải qua 64 vòng lặp (với các hàm phi tuyến $F, G, H, I$), trộn lẫn trạng thái của 4 thanh ghi này để sản sinh ra chuỗi vân tay cuối cùng dài **128-bit**.
 
-#### 2.3 Đánh giá An toàn
-Hiện nay, MD5 được coi là **đã bị phá vỡ hoàn toàn** trong lĩnh vực an ninh vì khả năng xảy ra va chạm (Collision) là rất cao bằng máy tính cá nhân thông thường. Tuy nhiên, nó vẫn được dùng để kiểm tra tính toàn vẹn (Checksum) cho các file không yêu cầu tính bảo mật tuyệt mật.`,
+---
+
+**Ví dụ thực nghiệm (Vân tay số):**
+Mã hóa từ \`hello\`:
+- **MD5:** \`5d41402abc4b2a76b9719d911017c592\`
+Chỉ cần thay đổi một chữ cái (ví dụ \`Hello\`), toàn bộ chuỗi MD5 sẽ thay đổi hoàn toàn.
+`,
+    security: `🔴 **Cảnh báo Nguy hiểm** — MD5 hiện được coi là **đã bị phá vỡ hoàn toàn**. Kẻ tấn công có thể tạo ra va chạm (Collision) dễ dàng. **KHÔNG** sử dụng cho các mục đích bảo mật đòi hỏi tính an toàn cao. Hãy luôn kết hợp **Salt** để hạn chế tấn công.`,
     practice: {
       question: `Thuật toán băm đòi hỏi tính chất bảo vệ nào để kẻ gian "Không thể lấy chuỗi mã $h$ và dịch ngược tìm ra văn bản $m$ gốc"? (Gợi ý nằm trong từ Kháng ... ảnh)`,
       answer: `Kháng tiền ảnh`,
