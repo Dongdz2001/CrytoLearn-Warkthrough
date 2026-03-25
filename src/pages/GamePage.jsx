@@ -1,148 +1,37 @@
 import { useState, useCallback } from 'react';
-import { caesarEncrypt } from '../ciphers/caesar';
-import { vigenereEncrypt } from '../ciphers/vigenere';
-import { atbashEncrypt } from '../ciphers/atbash';
-import { rot13Encrypt } from '../ciphers/rot13';
-import { xorEncrypt } from '../ciphers/xor';
-import { base64Encode, textToHex } from '../ciphers/base64';
-import { md5Hash, sha256Hash } from '../ciphers/hash';
+import { quizData } from '../data/quiz';
+import './GamePage.css'; // Assuming I might want to style it specifically
 
-const sampleTexts = [
-  'Hello World',
-  'Cryptography is fun',
-  'Secret message',
-  'Attack at dawn',
-  'The quick brown fox',
-  'Keep it secret',
-  'Information security',
-  'Data encryption',
-];
-
-const algorithms = [
-  {
-    id: 'caesar',
-    name: 'Caesar Cipher',
-    encrypt: (text) => caesarEncrypt(text, 3 + Math.floor(Math.random() * 20)),
-    hints: [
-      'Đây là mã hóa cổ điển, dịch chuyển ký tự.',
-      'Mỗi chữ cái được dịch cùng một khoảng cách.',
-      'Julius Caesar từng dùng phương pháp này.',
-    ],
-  },
-  {
-    id: 'vigenere',
-    name: 'Vigenère Cipher',
-    encrypt: (text) => vigenereEncrypt(text, 'SECRET'),
-    hints: [
-      'Sử dụng từ khóa để mã hóa.',
-      'Các ký tự khác nhau dịch chuyển khác nhau.',
-      'Từng được gọi là "mật mã không thể phá".',
-    ],
-  },
-  {
-    id: 'atbash',
-    name: 'Atbash Cipher',
-    encrypt: (text) => atbashEncrypt(text),
-    hints: [
-      'Đây là mã đảo ngược bảng chữ cái.',
-      'A thành Z, B thành Y...',
-      'Có nguồn gốc từ Hebrew cổ đại.',
-    ],
-  },
-  {
-    id: 'rot13',
-    name: 'ROT13',
-    encrypt: (text) => rot13Encrypt(text),
-    hints: [
-      'Đây là trường hợp đặc biệt của Caesar.',
-      'Dịch chuyển đúng 13 vị trí.',
-      'Mã hóa 2 lần sẽ ra bản gốc.',
-    ],
-  },
-  {
-    id: 'xor',
-    name: 'XOR Cipher',
-    encrypt: (text) => xorEncrypt(text, 'KEY'),
-    hints: [
-      'Kết quả là các cặp số hex.',
-      'Sử dụng phép toán bit XOR.',
-      'Nền tảng của nhiều thuật toán hiện đại.',
-    ],
-  },
-  {
-    id: 'base64',
-    name: 'Base64',
-    encrypt: (text) => base64Encode(text),
-    hints: [
-      'Đây không phải mã hóa bảo mật.',
-      'Kết quả chỉ chứa A-Z, a-z, 0-9, +, /, =',
-      'Thường kết thúc bằng dấu = hoặc ==',
-    ],
-  },
-  {
-    id: 'hex',
-    name: 'Hex Encoding',
-    encrypt: (text) => textToHex(text),
-    hints: [
-      'Đây là chuyển đổi hệ cơ số.',
-      'Mỗi ký tự thành 2 chữ số hex (0-9, a-f).',
-      'Hệ thập lục phân (cơ số 16).',
-    ],
-  },
-  {
-    id: 'md5',
-    name: 'MD5 Hash',
-    encrypt: (text) => md5Hash(text),
-    hints: [
-      'Đây là hàm băm 1 chiều.',
-      'Kết quả luôn có 32 ký tự hex.',
-      'Không thể giải mã ngược.',
-    ],
-  },
-  {
-    id: 'sha256',
-    name: 'SHA-256 Hash',
-    encrypt: (text) => sha256Hash(text),
-    hints: [
-      'Đây là hàm băm 1 chiều.',
-      'Kết quả luôn có 64 ký tự hex.',
-      'Được dùng trong Bitcoin.',
-    ],
-  },
-];
-
-function getRandomQuestion() {
-  const text = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
-  const algo = algorithms[Math.floor(Math.random() * algorithms.length)];
-  const cipherText = algo.encrypt(text);
-
-  // Generate 4 options, including the correct one
-  const options = [algo];
-  while (options.length < 4) {
-    const random = algorithms[Math.floor(Math.random() * algorithms.length)];
-    if (!options.find((o) => o.id === random.id)) {
-      options.push(random);
-    }
+function getRandomQuestion(prevIndex = -1) {
+  let index = Math.floor(Math.random() * quizData.length);
+  // Avoid repeating the same question immediately
+  while (index === prevIndex && quizData.length > 1) {
+    index = Math.floor(Math.random() * quizData.length);
   }
-  // Shuffle options
-  options.sort(() => Math.random() - 0.5);
-
-  return { text, cipherText, correctAlgo: algo, options };
+  const q = quizData[index];
+  
+  // Shuffle options for more challenge
+  const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+  
+  return { ...q, options: shuffledOptions, originalIndex: index };
 }
 
 export default function GamePage() {
   const [question, setQuestion] = useState(() => getRandomQuestion());
   const [selected, setSelected] = useState(null);
-  const [hintIndex, setHintIndex] = useState(-1);
+  const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(0);
   const [streak, setStreak] = useState(0);
 
-  const handleAnswer = (algoId) => {
-    if (selected !== null) return;
-    setSelected(algoId);
+  const handleAnswer = (option) => {
+    if (isAnswered) return;
+    
+    setSelected(option);
+    setIsAnswered(true);
     setTotal((t) => t + 1);
-    if (algoId === question.correctAlgo.id) {
+    
+    if (option === question.answer) {
       setScore((s) => s + 1);
       setStreak((s) => s + 1);
     } else {
@@ -151,26 +40,19 @@ export default function GamePage() {
   };
 
   const handleNext = useCallback(() => {
-    setQuestion(getRandomQuestion());
+    setQuestion(getRandomQuestion(question.originalIndex));
     setSelected(null);
-    setHintIndex(-1);
-  }, []);
+    setIsAnswered(false);
+  }, [question.originalIndex]);
 
-  const handleHint = () => {
-    const maxHints = question.correctAlgo.hints.length;
-    if (hintIndex < maxHints - 1) {
-      setHintIndex((i) => i + 1);
-    }
-  };
-
-  const isCorrect = selected === question.correctAlgo.id;
+  const isCorrect = selected === question.answer;
 
   return (
     <div className="page-container game-container fade-in">
-      <div className="page-header">
-        <h1 className="page-title">🎮 Đoán Thuật Toán</h1>
+      <div className="page-header" style={{ marginBottom: '20px' }}>
+        <h1 className="page-title">🧠 Thử Thách Mật Mã</h1>
         <p className="page-subtitle">
-          Nhìn đoạn mã hóa và đoán xem thuật toán nào được sử dụng!
+          Kiểm tra kiến thức về 6 trụ cột mật mã học qua bộ câu hỏi trắc nghiệm tổng hợp.
         </p>
       </div>
 
@@ -179,7 +61,7 @@ export default function GamePage() {
           🏆 Điểm: <span className="score-value">{score}/{total}</span>
         </div>
         <div className="game-score">
-          🔥 Streak: <span className="score-value">{streak}</span>
+          🔥 Chuỗi: <span className="score-value">{streak}</span>
         </div>
         <div className="game-score">
           📊 Tỉ lệ: <span className="score-value">
@@ -188,68 +70,100 @@ export default function GamePage() {
         </div>
       </div>
 
-      <div className="game-question-card">
-        <div className="game-question-label">Đoạn văn bản đã được mã hóa:</div>
-        <div className="game-cipher-text">{question.cipherText}</div>
-
-        {selected !== null && (
-          <div className="game-original-text">
-            📝 Bản gốc: <strong>{question.text}</strong>
-          </div>
-        )}
-
-        <div className="game-question-label" style={{ marginTop: '1rem' }}>
-          Đây là thuật toán nào?
+      <div className="game-question-card quiz-mode">
+        {/* Category Badge */}
+        <div style={{ 
+          display: 'inline-block', 
+          background: '#6c5ce7', 
+          color: 'white', 
+          padding: '4px 12px', 
+          borderRadius: '50px', 
+          fontSize: '0.75rem', 
+          fontWeight: 'bold',
+          marginBottom: '15px',
+          fontFamily: 'var(--font-primary)'
+        }}>
+          📁 {question.category}
         </div>
 
-        <div className="game-options">
-          {question.options.map((algo) => {
-            let cls = 'game-option-btn';
-            if (selected !== null) {
-              if (algo.id === question.correctAlgo.id) cls += ' correct';
-              else if (algo.id === selected) cls += ' wrong';
+        <div className="game-question-text" style={{ 
+          fontSize: '1.2rem', 
+          fontWeight: '700', 
+          color: '#2d3436', 
+          lineHeight: '1.5',
+          marginBottom: '25px',
+          fontFamily: 'var(--font-academic)'
+        }}>
+          {question.question}
+        </div>
+
+        <div className="game-options quiz-grid" style={{ 
+          display: 'grid', 
+          gridTemplateColumns: '1fr 1fr', 
+          gap: '12px' 
+        }}>
+          {question.options.map((option, idx) => {
+            let cls = 'game-option-btn quiz-option';
+            if (isAnswered) {
+              if (option === question.answer) cls += ' correct';
+              else if (option === selected) cls += ' wrong';
             }
             return (
               <button
-                key={algo.id}
+                key={idx}
                 className={cls}
-                onClick={() => handleAnswer(algo.id)}
-                disabled={selected !== null}
+                onClick={() => handleAnswer(option)}
+                disabled={isAnswered}
+                style={{
+                  textAlign: 'left',
+                  padding: '15px 20px',
+                  borderRadius: '12px',
+                  height: 'auto',
+                  minHeight: '60px',
+                  fontSize: '0.95rem'
+                }}
               >
-                {algo.name}
+                <span style={{ marginRight: '10px', opacity: 0.6 }}>{String.fromCharCode(65 + idx)}.</span>
+                {option}
               </button>
             );
           })}
         </div>
 
-        {/* Hints */}
-        {selected === null && (
-          <button className="game-hint-btn" onClick={handleHint}>
-            💡 Gợi ý ({hintIndex + 1}/{question.correctAlgo.hints.length})
-          </button>
-        )}
-
-        {hintIndex >= 0 && selected === null && (
-          <div className="game-hint">
-            {question.correctAlgo.hints.slice(0, hintIndex + 1).map((hint, i) => (
-              <div key={i}>💡 {hint}</div>
-            ))}
-          </div>
-        )}
-
-        {/* Result */}
-        {selected !== null && (
-          <div className={`game-result ${isCorrect ? 'correct' : 'wrong'}`}>
-            {isCorrect
-              ? `✅ Chính xác! Đây là ${question.correctAlgo.name}.`
-              : `❌ Sai rồi! Đáp án đúng là ${question.correctAlgo.name}.`}
+        {/* Explanation & Feedback */}
+        {isAnswered && (
+          <div className={`quiz-feedback-box fade-in ${isCorrect ? 'is-correct' : 'is-wrong'}`} style={{
+            marginTop: '30px',
+            padding: '20px',
+            borderRadius: '12px',
+            background: isCorrect ? '#f0fff4' : '#fff5f5',
+            border: `1px solid ${isCorrect ? '#68d391' : '#feb2b2'}`,
+          }}>
+            <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '10px', color: isCorrect ? '#2f855a' : '#c53030' }}>
+              {isCorrect ? '✅ Chính xác!' : `❌ Sai rồi! Đáp án đúng là: ${question.answer}`}
+            </div>
+            <div style={{ fontSize: '0.9rem', color: '#4a5568', fontStyle: 'italic', lineHeight: '1.6' }}>
+              <strong>Giải thích:</strong> {question.explanation}
+            </div>
           </div>
         )}
       </div>
 
-      {selected !== null && (
-        <button className="game-next-btn" onClick={handleNext}>
-          Câu tiếp theo →
+      {isAnswered && (
+        <button 
+          className="game-next-btn quiz-next" 
+          onClick={handleNext}
+          style={{
+            marginTop: '25px',
+            width: '100%',
+            background: '#6c5ce7',
+            padding: '15px',
+            borderRadius: '12px',
+            fontWeight: 'bold',
+            fontSize: '1rem'
+          }}
+        >
+          Tiếp theo →
         </button>
       )}
     </div>

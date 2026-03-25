@@ -23,7 +23,47 @@ export default function DemoTool({ cipherId }) {
   const [rsaKeys, setRsaKeys] = useState(null);
   const [signature, setSignature] = useState('');
   const [verifyResult, setVerifyResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [copiedField, setCopiedField] = useState(null);
+
+  const handleCopy = (text, fieldId) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    setCopiedField(fieldId);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const CopyButton = ({ text, fieldId }) => (
+    <button
+      onClick={() => handleCopy(text, fieldId)}
+      className="copy-btn"
+      title="Copy to clipboard"
+      style={{
+        background: 'none',
+        border: 'none',
+        padding: '4px',
+        cursor: 'pointer',
+        fontSize: '0.8rem',
+        color: copiedField === fieldId ? 'var(--accent-green)' : 'var(--text-muted)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px',
+        marginLeft: 'auto',
+        transition: 'all 0.2s'
+      }}
+    >
+      {copiedField === fieldId ? (
+        <>
+          <span style={{ fontSize: '0.9rem' }}>✅</span>
+          <span>Đã copy</span>
+        </>
+      ) : (
+        <>
+          <span style={{ fontSize: '0.9rem' }}>📋</span>
+          <span>Copy</span>
+        </>
+      )}
+    </button>
+  );
 
   const handleEncrypt = () => {
     try {
@@ -151,7 +191,10 @@ export default function DemoTool({ cipherId }) {
             </div>
           </div>
           <div className="demo-group">
-            <label className="demo-label">Văn bản cần băm</label>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+              <label className="demo-label" style={{ marginBottom: 0 }}>Văn bản cần băm</label>
+              <CopyButton text={input} fieldId="hash-input" />
+            </div>
             <textarea
               className="demo-textarea"
               placeholder="Nhập văn bản..."
@@ -160,7 +203,10 @@ export default function DemoTool({ cipherId }) {
             />
           </div>
           <div className="demo-group">
-            <label className="demo-label">Kết quả Hash ({hashType})</label>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+              <label className="demo-label" style={{ marginBottom: 0 }}>Kết quả Hash ({hashType})</label>
+              <CopyButton text={output} fieldId="hash-output" />
+            </div>
             <div className="demo-output">{output || 'Kết quả sẽ hiện ở đây...'}</div>
           </div>
           <div className="demo-group full-width">
@@ -197,7 +243,10 @@ export default function DemoTool({ cipherId }) {
             </div>
           )}
           <div className="demo-group">
-            <label className="demo-label">Văn bản</label>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+              <label className="demo-label" style={{ marginBottom: 0 }}>Văn bản</label>
+              <CopyButton text={input} fieldId="encode-input" />
+            </div>
             <textarea
               className="demo-textarea"
               placeholder="Nhập văn bản..."
@@ -206,7 +255,10 @@ export default function DemoTool({ cipherId }) {
             />
           </div>
           <div className="demo-group">
-            <label className="demo-label">Kết quả</label>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+              <label className="demo-label" style={{ marginBottom: 0 }}>Kết quả</label>
+              <CopyButton text={output} fieldId="encode-output" />
+            </div>
             <div className="demo-output">{output || 'Kết quả sẽ hiện ở đây...'}</div>
           </div>
           <div className="demo-group full-width">
@@ -244,7 +296,10 @@ export default function DemoTool({ cipherId }) {
             )}
           </div>
           <div className="demo-group">
-            <label className="demo-label">Thông điệp cần ký</label>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+              <label className="demo-label" style={{ marginBottom: 0 }}>Thông điệp cần ký</label>
+              <CopyButton text={input} fieldId="sig-input" />
+            </div>
             <textarea
               className="demo-textarea"
               placeholder="Nhập thông điệp..."
@@ -253,7 +308,10 @@ export default function DemoTool({ cipherId }) {
             />
           </div>
           <div className="demo-group">
-            <label className="demo-label">Chữ ký số</label>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+              <label className="demo-label" style={{ marginBottom: 0 }}>Chữ ký số</label>
+              <CopyButton text={signature} fieldId="sig-output" />
+            </div>
             <div className="demo-output">{signature || 'Chữ ký sẽ hiện ở đây...'}</div>
           </div>
           <div className="demo-group full-width">
@@ -397,7 +455,10 @@ export default function DemoTool({ cipherId }) {
         )}
 
         <div className="demo-group">
-          <label className="demo-label">Văn bản gốc (Plaintext)</label>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+            <label className="demo-label" style={{ marginBottom: 0 }}>Văn bản gốc (Plaintext)</label>
+            <CopyButton text={input} fieldId="plain-input" />
+          </div>
           <textarea
             className="demo-textarea"
             placeholder="Nhập văn bản cần mã hóa..."
@@ -407,7 +468,10 @@ export default function DemoTool({ cipherId }) {
         </div>
 
         <div className="demo-group">
-          <label className="demo-label">Kết quả (Ciphertext)</label>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+            <label className="demo-label" style={{ marginBottom: 0 }}>Kết quả (Ciphertext)</label>
+            <CopyButton text={output} fieldId="cipher-output" />
+          </div>
           <div className="demo-output">{output || 'Kết quả sẽ hiện ở đây...'}</div>
         </div>
 
