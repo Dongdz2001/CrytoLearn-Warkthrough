@@ -24,6 +24,7 @@ export default function DemoTool({ cipherId }) {
   const [signature, setSignature] = useState('');
   const [verifyResult, setVerifyResult] = useState(null);
   const [copiedField, setCopiedField] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleCopy = (text, fieldId) => {
     if (!text) return;
