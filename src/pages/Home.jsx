@@ -5,7 +5,8 @@ export default function Home() {
   return (
     <div className="page-container">
       <div className="page-header fade-in">
-        <h1 className="page-title">🔐 Khám phá Mật mã học</h1>
+        <h1 className="page-title">🔐 Cryptography Learning</h1>
+
         <p className="page-subtitle">
           Học lý thuyết, thực hành mã hóa & giải mã, và thử thách bản thân với trò chơi đoán thuật toán.
         </p>

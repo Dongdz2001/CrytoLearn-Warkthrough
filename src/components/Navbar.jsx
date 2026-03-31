@@ -14,8 +14,9 @@ export default function Navbar() {
       <div className="navbar-inner">
         <Link to="/" className="navbar-logo">
           <span className="logo-icon">🔐</span>
-          <span className="logo-text">CryptoLearn</span>
+          <span className="logo-text">Cryptography Learning</span>
         </Link>
+
 
         <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? '✕' : '☰'}
