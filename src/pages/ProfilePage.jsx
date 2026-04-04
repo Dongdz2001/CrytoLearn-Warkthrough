@@ -8,6 +8,11 @@ export default function ProfilePage() {
   const [stats, setStats] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedRoundId, setExpandedRoundId] = useState(null);
+
+  const toggleRound = (id) => {
+    setExpandedRoundId(expandedRoundId === id ? null : id);
+  };
 
   useEffect(() => {
     if (user) {
@@ -93,24 +98,61 @@ export default function ProfilePage() {
         ) : (
           <div className="history-list">
             {history.map((round) => (
-              <div key={round.id} className="history-round-card">
-                <div className="round-main-info">
-                  <div className={`round-level-badge ${round.level}`}>
-                    {round.level === 'easy' ? 'Dễ' : round.level === 'medium' ? 'Trung bình' : 'Khó'}
+              <div key={round.id} className="history-round-wrapper">
+                <div 
+                  className={`history-round-card ${expandedRoundId === round.id ? 'expanded' : ''}`}
+                  onClick={() => toggleRound(round.id)}
+                >
+                  <div className="round-main-info">
+                    <div className={`round-level-badge ${round.level}`}>
+                      {round.level === 'easy' ? 'Dễ' : round.level === 'medium' ? 'Trung bình' : 'Khó'}
+                    </div>
+                    <div className="round-date">
+                      {round.timestamp?.toLocaleString('vi-VN')}
+                    </div>
                   </div>
-                  <div className="round-date">
-                    {round.timestamp?.toLocaleString('vi-VN')}
+                  <div className="round-score-info">
+                    <span className="round-score-text">Đúng: <strong>{round.score}/{round.totalQuestions || 10}</strong></span>
+                    <div className="round-progress-track">
+                      <div 
+                        className="round-progress-fill" 
+                        style={{ width: `${(round.score / (round.totalQuestions || 10)) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="expand-indicator">
+                    {expandedRoundId === round.id ? '▲' : '▼'}
                   </div>
                 </div>
-                <div className="round-score-info">
-                  <span className="round-score-text">Đúng: <strong>{round.score}/{round.totalQuestions || 10}</strong></span>
-                  <div className="round-progress-track">
-                    <div 
-                      className="round-progress-fill" 
-                      style={{ width: `${(round.score / (round.totalQuestions || 10)) * 100}%` }}
-                    ></div>
+
+                {expandedRoundId === round.id && round.history && (
+                  <div className="round-details-container fade-in">
+                    <h4 className="details-heading">Chi tiết các câu hỏi</h4>
+                    <div className="details-list">
+                      {round.history.map((q, idx) => (
+                        <div key={idx} className={`detail-item ${q.isCorrect ? 'correct' : 'wrong'}`}>
+                          <div className="detail-question">
+                            <span className="q-num">Câu {idx + 1}:</span> {q.question}
+                          </div>
+                          <div className="detail-answers">
+                            <div className="ans-row">
+                              <span className="ans-label">Bạn chọn:</span>
+                              <span className={`ans-value ${q.isCorrect ? 'text-success' : 'text-danger'}`}>
+                                {q.selectedAnswer || 'Không có lựa chọn'}
+                              </span>
+                            </div>
+                            {!q.isCorrect && (
+                              <div className="ans-row">
+                                <span className="ans-label">Đáp án đúng:</span>
+                                <span className="ans-value text-success">{q.correctAnswer}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             ))}
           </div>

@@ -218,3 +218,117 @@
     width: 100%;
   }
 }
+
+/* History Details (Expandable) */
+.history-round-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-glass);
+  background: var(--bg-card);
+}
+
+.history-round-card {
+  /* reset borders since wrapper has it */
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  cursor: pointer;
+  background: transparent;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all var(--transition-fast);
+}
+
+.history-round-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.history-round-card.expanded {
+  background: rgba(108, 92, 231, 0.1);
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.expand-indicator {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-left: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.round-details-container {
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.details-heading {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 0.5rem;
+}
+
+.details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detail-item {
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 4px solid var(--text-muted);
+}
+
+.detail-item.correct {
+  border-left-color: #00b894;
+  background: rgba(0, 184, 148, 0.05);
+}
+
+.detail-item.wrong {
+  border-left-color: #d63031;
+  background: rgba(214, 48, 49, 0.05);
+}
+
+.detail-question {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.8rem;
+  line-height: 1.4;
+}
+
+.q-num {
+  color: var(--accent-purple);
+  margin-right: 5px;
+}
+
+.detail-answers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.ans-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ans-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  min-width: 100px;
+}
+
+.ans-value {
+  font-weight: 600;
+}
+
+.text-success { color: #00b894; }
+.text-danger { color: #d63031; }

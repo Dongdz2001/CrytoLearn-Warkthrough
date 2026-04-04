@@ -62,9 +62,7 @@ Nên kết quả là **FUUQJ**.`
     howItWorks: `Sử dụng một từ khóa lặp lại (keyword) để xác định phép dịch chuyển cho từng ký tự một. Mỗi ký tự trong từ khóa đóng vai trò như một khóa $K_i$ của bản thân nó trong hệ mã Caesar.
 
 **Bảng tra cứu chỉ số chữ cái (A=0, B=1...):**
-| A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10| 11| 12| 13| 14| 15| 16| 17| 18| 19| 20| 21| 22| 23| 24| 25|
+![Chỉ số Bảng chữ cái Vigenère (Numeric Mapping)](/assets/vigenere_mapping.svg)
 
 **Công thức chung:**
 - **Mã hóa:** $C_i = (M_i + K_i) \\pmod{26}$
